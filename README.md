@@ -8,6 +8,9 @@ GUI for conversational graph editing/testing and Bot configuration
 This project t of the SEED token project. This is a sneak preview - there is more to come.
 See [the Wiki](https://github.com/SeedVault/SEEDtoken-IP/wiki) for more information.
 
+# How to contribute - how to get involved
+Go to our **[Developers Garden](https://developers.seedtoken.io)** to see all featured projects, pick one and fill out the **[Developer Interest Form](https://developers.seedtoken.io/#Developer-Interest-Form)**.
+
 
 # Disclaimer
 These files are made available to you on an as-is and restricted basis, and may only be redistributed or sold to any third party as expressly indicated in the Terms of Use for Seed Vault. Seed Vault Code (c) Botanic Technologies, Inc. Used under license.
