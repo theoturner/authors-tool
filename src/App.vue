@@ -16,7 +16,7 @@
            
             if (process.env.NODE_ENV != 'development') {//check versions with ping only on production
                 window.setInterval(() => {
-                    this.$http.get('/api/system/ping', {});
+                    this.$http.get('/api/system/ping/', {});
                 }, 1000 * 60 * 5);
             }
         }

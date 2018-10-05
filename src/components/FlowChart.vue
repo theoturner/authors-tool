@@ -141,24 +141,14 @@
                 jQuery('#container').scrollTop(0);
 
                 //Get flow data
-                this.$http.get(`/api/flow/${flowId}`)
+                this.$http.get(`/api/dotflows/${flowId}`)
                         .then(response => {
 
-                            this.flow = JSON.parse(_.get(response.data, 'flow'));
-                            this.updatedAt = response.data.updated_at;
-
-                            if (_.get(this.flow.nodes, 'length')) {
-
-                                this.name = response.data.name;
-
-                            } else {
-                                //generate new flow object with just root node
-                                this.name = 'flow' + flowId;
-                                this.flow = {id: flowId, name: "flow" + flowId, nodes: [{id: "root-node", name: "flow" + flowId, type: "root", connections: [{default: "end"}]}]};
-
-                            }
+                            this.flowContainer = response.data;
+                            this.flow = this.flowContainer.dotflow;
 
                             this.flowLoaded = true;
+                            this.flowId = flowId
 
                             //generate graph data for ui representation of the json flow
                             this.processFlow();
@@ -1053,24 +1043,20 @@
                     });
                 });
 
-                var promise = this.$http.post(`/api/flow/${this.flowId}`, {
-                    flowId: this.flowId,
-                    flow: this.flow,
-                    updatedAt: this.updatedAt
-                })
-                        .then(
-                                (response) => {
-                            this.updatedAt = response.data.updated_at;
-                        },
-                                (error) => {
-                            if (error.response.data.message == 'UPDATEDAT_MISMATCH') {
-                                alert('The flow was updated by another user. Your changes will be discarded.');
-                                this.loadFlow(this.flowId);
-                            } else {
-                                console.log(error.response);
-                                alert(error);
-                            }
-                        });
+                var promise = this.$http.put(`/api/dotflows/${this.flowId}`, this.flowContainer)
+                            .then(
+                                    (response) => {
+                                      this.flowContainer = response.data;
+                            },
+                                    (error) => {
+                                if (error.response.data.message == 'UPDATEDAT_MISMATCH') {
+                                    alert('The flow was updated by another user. Your changes will be discarded.');
+                                    this.loadFlow(this.flowId);
+                                } else {
+                                    console.log(error.response);
+                                    alert(error);
+                                }
+                            });
 
                 return promise;
             },

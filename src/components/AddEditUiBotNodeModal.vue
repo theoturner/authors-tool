@@ -647,7 +647,7 @@
              */
             loadForms() {
                 //load field ids from all flows of the project
-                this.$http.get(`/api/project/${this.project.id}/formIds`, {})
+                this.$http.get(`/api/dotbots/${this.project.id}/formIds/`, {})
                         .then(
                                 (response) => {
 

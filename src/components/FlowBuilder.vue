@@ -12,7 +12,7 @@
 
         <ul id="flowTabs" class="nav nav-tabs">
             <li class="nav-item" v-for="(flow, flowIdx) in flows.slice(0,9)" :key="flow.id" v-on:click.prevent="setFlowId(flow.id)">
-                <a class="nav-link" href="#" :id="`flow${flow.id}`" :title="flow.name">{{ _.truncate(flow.name,{length: 13}) }}<span class="edit" @click.prevent.stop="showEditFlowModal(flow, flowIdx == 0)"></span></a>
+                <a class="nav-link" href="#" :id="`flow${flow.id}`" :title="flow.dotflow.name">{{ _.truncate(flow.dotflow.name,{length: 13}) }}<span class="edit" @click.prevent.stop="showEditFlowModal(flow, flowIdx == 0)"></span></a>
             </li>          
             <li v-show="flows.length > 9" class="nav-item list">
                 <a class="nav-link dropdown-toggle" v-bind:class="{'active': moreFlowName != 'More'}" data-toggle="dropdown"  id="dropbtn" href="#">
@@ -25,7 +25,7 @@
                 </ul>
             </li>
             <li class="nav-item">
-                <a class="nav-link btMas" href="#" v-on:click.prevent="showAddFlowModal">+</a>
+                <a class="nav-link btMas" href="#" @click.prevent="showAddFlowModal()">+</a>
             </li>
         </ul>               
 
@@ -158,7 +158,7 @@
 
                 var project = {};
 
-                return this.$http.get(`/api/project/${projectId}/flow`)
+                return this.$http.get(`/api/dotbots/${projectId}/dotflows/?fields=dotflow.name`)
                         .then(response => {
                             this.flows = response.data;
 
@@ -206,11 +206,15 @@
              */
             showEditFlowModal(flow, isRootFlow) {
 
-                this.$refs.addEditFlowModal.show(flow, isRootFlow)
+                this.$refs.addEditFlowModal.show(flow.dotflow, isRootFlow)
                         .then((newFlow) => {
-                            this.editFlow(newFlow, this.$route.params.projectId);
 
-                            Object.assign(flow, newFlow);
+                                var newDotflow = _.cloneDeep(flow);
+                                newDotflow.dotflow = newFlow;
+
+                            this.editFlow(newDotflow, this.$route.params.projectId);
+
+                            Object.assign(flow, newDotflow);
 
                         })
                         .catch(() => {
@@ -224,17 +228,15 @@
              * @param {Int} projectId Project id
              */
             editFlow(newFlow, projectId) {
-                if (!newFlow.name || !newFlow.id) {
+                if (!newFlow.dotflow.name || !newFlow.id) {
                     return;
                 }
 
-                var newFlowObj = {
-                    name: newFlow.name,
-                    flowId: newFlow.id //@TODO this might not be needed, remove from backend too                                        
-                };
+                flowId = newFlow.id
+                delete newFlow.id
 
                 //add new flow in db. get new id
-                return this.$http.post(`/api/flow/${newFlow.id}`, newFlowObj);
+                return this.$http.put(`/api/dotflows/${flowId}`, newFlow);
 
             },
 
@@ -260,7 +262,7 @@
              */
             addFlowAndGo(newFlow) {
 
-                this.addFlow(newFlow.name, this.$route.params.projectId)
+                this.addFlow(newFlow, this.$route.params.projectId)
                         .then(response => {
                             this.setFlowId(response.data.id);
                         })
@@ -278,28 +280,28 @@
              * @returns {Promise}
              * 
              */
-            addFlow(name, projectId) {
-
-                var newFlow = {
-                    projectId: projectId,
-                    name: name,
-                    flowId: 0, //@TODO this might not be needed, remove from backend too                    
-                    flow: {}
-                };
-
-
-                if (!newFlow.name || !newFlow.projectId) {
+            addFlow(newFlow, projectId) {
+                if (!newFlow.name || !projectId) {
                     return;
                 }
 
+                //skeleton of empty node
+                newFlow.nodes = [{id: "root-node", name: "", type: "root", connections: [{default: "end"}]}]
+                //flow container
+                var newDotflow = {
+                    dotflow: newFlow
+                }
+
+
+
+
                 //add new flow in db. get new id
-                var promise = this.$http.post(`/api/flow/0`, newFlow);
+                var promise = this.$http.post(`/api/dotbots/${projectId}/dotflows/`, newDotflow);
 
                 promise.then((response) => {
                     //component will reload the new flow
-                    newFlow.flowId = response.data.id;
                     newFlow.id = response.data.id;
-                    this.flows.push(newFlow);
+                    this.flows.push(newDotflow);
                     this.flowChartEnabled = true;
                 });
 
@@ -332,7 +334,7 @@
              */
             deleteFlow(flow) {
 
-                this.$http.delete(`/api/flow/${flow.id}`)
+                this.$http.delete(`/api/dotflows/${flow.id}`)
                         .then(response => {
 
                             this.loadProjectFlows(this.$route.params.projectId).then(() => {

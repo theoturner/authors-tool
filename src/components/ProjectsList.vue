@@ -17,7 +17,7 @@
                         <img src="../assets/images/arrowdown.svg" class="arrowdown">
                     </div>
                     <div class="project-name">
-                        {{ p.name }}
+                        {{ p.dotbot.name }} - {{ p.dotbot.description }}
                         <div class="settings-icon" v-on:click="showAddEditProjectModal(p)"></div>
                     </div>
                     <div class="separator"></div>
@@ -81,7 +81,7 @@
              * 
              */
             loadProjects() {
-                this.$http.get('/api/project')
+                this.$http.get('/api/dotbots/')
                         .then(response => {
                             this.projects = response.data;
                         })
@@ -96,7 +96,7 @@
              * @param {Object} project Project object             
              */
             goConvBuilder(project) {
-                this.$router.push({name: 'FlowBuilder', params: {projectId: project.id, projectName: project.name}});
+                this.$router.push({name: 'FlowBuilder', params: {projectId: project.id, projectName: project.dotbot.name}});
             },
 
             /**
@@ -106,12 +106,10 @@
              */
             showAddEditProjectModal(project) {
 
-                var id = 0;
                 var addProjectPromise;
-                if (project.id) {
-                    id = project.id;
+                if (_.get(project, 'id')) {
                     //load project config
-                    addProjectPromise = this.$http.get(`/api/project/${id}`);
+                    addProjectPromise = this.$http.get(`/api/dotbots/${project.id}`);
                 } else {
                     //dummy promise auto resolvable
                     addProjectPromise = new Promise(function (resolve, reject) {
@@ -121,35 +119,40 @@
 
                 //when config loaded, launch modal
                 addProjectPromise.then((response) => {
-                    var newProject = {};
+
+                    var newProject = {dotbot:{}}
+
                     if (response && response.data) {
                         newProject = response.data;
                     }
-                    newProject.id = id;
 
-                    delete(newProject.bot_id);
-
-                    this.$refs.addEditProjectModal.show(newProject)
-                            .then((newProject) => {
-                                newProject.id = id;
-                                project.name = newProject.name;
-                                this.addProject(newProject);
+                    this.$refs.addEditProjectModal.show(newProject.dotbot)
+                            .then((newDotbot) => {
+                                project.dotbot = newDotbot
+                                this.addEditProject(project);
                             });
                 });
             },
 
             /**
              * Adds a project to the logged users' organization
-             * 
+             *
+             * @param {Int} id Internal dotbot id
              * @param {Object} newProject New project object
              */
-            addProject(newProject) {
+            addEditProject(newProject) {
 
-                if (!newProject.name) {
+                if (!newProject.dotbot.name) {
                     return;
                 }
 
-                this.$http.post(`/api/project/${newProject.id}`, newProject)
+                var id = _.get(newProject, 'id', '')
+                var method = id ? 'put' : 'post'
+
+                this.$http({
+                    method: method,
+                    url: `/api/dotbots/${id}`,
+                    data: newProject})
                         .then(response => {
                             if (!newProject.id) {
                                 this.goConvBuilder(response.data);
@@ -178,7 +181,7 @@
              * @param {Int} projectId Project id
              */
             deleteProject(projectId) {
-                this.$http.delete('/api/project/' + projectId)
+                this.$http.delete(`/api/dotbots/${projectId}`)
                         .then(response => {
                             this.loadProjects();
                         });

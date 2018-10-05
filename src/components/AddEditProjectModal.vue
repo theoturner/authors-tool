@@ -17,7 +17,11 @@
                         <div class="form-group form-inline">
                             <label for="name">Name</label>
                             <input class="form-control" v-model="frm.name" autofocus>
-                        </div>  
+                        </div>
+                        <div class="form-group form-inline">
+                            <label for="description">Description</label>
+                            <input class="form-control" v-model="frm.description">
+                        </div>
                         
                     </form>
                 </div>
@@ -50,8 +54,8 @@
             return {
 
                 frm: {
-                    id: 0,
                     name: '',
+                    description: '',
                     status: 'enabled',
                     modes: [],
                     channels: []

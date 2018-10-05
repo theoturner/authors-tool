@@ -12,7 +12,8 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {        
         '/api/**': {
-            target: 'http://[::1]:8000' //works for local php cli web server
+            target: 'http://localhost:8000' //works for local php cli web server
+
         }        
     },
     // Various Dev Server settings

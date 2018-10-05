@@ -39,7 +39,7 @@ axios.interceptors.response.use((response) => {
     return response;
 
 }, (error) => {
-    
+console.log(JSON.stringify(error))
     //checks if it's logged
     if (error.response.status == 401) {
         router.replace({name: 'Login'});

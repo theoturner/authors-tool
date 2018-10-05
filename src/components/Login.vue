@@ -67,7 +67,7 @@
              */
             login() {
 
-                this.$http.get('/api/system/login',
+                this.$http.get('/api/system/login/',
                         {
                             params: {
                                 username: this.username,

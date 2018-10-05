@@ -474,7 +474,7 @@
              */
             loadProjectFieldIds() {//@TODO this should be fired from flowBuilder like formIds
                 //load field ids from all flows of the project
-                this.$http.get(`/api/project/${this.project.id}/fieldIds`, {})
+                this.$http.get(`/api/dotbots/${this.project.id}/fieldIds/`, {})
                         .then(
                                 (response) => {
 
