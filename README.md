@@ -19,7 +19,7 @@ These files are made available to you on an as-is and restricted basis, and may 
 
 ## Backend Python code
 
-The backend of the open source project build with Python is being developed and it will be released on September 2018. 
+The Python  backend of the Author's tool is part of Rhizome project [dot_repository folder](https://github.com/SeedVault/rhizome/tree/master/dot_repository) .
 
 A full working version of the backend is available on [Botanic's repository](https://github.com/botanicinc/authors-tool-php) build with PHP language.
 
