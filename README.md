@@ -5,7 +5,7 @@ GUI for conversational graph editing/testing and Bot configuration
 # Introduction
 
 
-This project t of the SEED token project. This is a sneak preview - there is more to come.
+This project is part of the SEED token project. This is a sneak preview - there is more to come.
 See [the Wiki](https://github.com/SeedVault/SEEDtoken-IP/wiki) for more information.
 
 # How to contribute - how to get involved
@@ -31,7 +31,6 @@ This builds and run the application as a development instance and sets the test 
 ```bash
 # To make webpack build dev files and start webpack webserver. 
 # This will start listening by default to http://localhost:8080
-cd frontend
 npm ci
 BOTANIC_ENV=local HADRON_URI="https://domain/dev_author/hadron.php" npm run dev
 ```
